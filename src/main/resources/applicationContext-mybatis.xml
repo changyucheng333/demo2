@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
+		
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>classpath:database.properties</value>
+		</property>
+	</bean>	
+	<!-- spring配置数据库连接池的数据源 -->	
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="clone"> 
+		<property name="driverClassName" value="${driver}"/>
+		<property name="url" value="${url}"/>
+		<property name="username" value="root"/>
+		<property name="password" value="root"/>
+	</bean>	
+	
+		 <!-- 定义数据源 -->
+	<!-- <bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
+		destroy-method="close">
+		数据库驱动
+		<property name="driverClass" value="${jdbc.driverClassName}" />
+		相应驱动的jdbcUrl
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		数据库的用户名
+		<property name="username" value="${jdbc.username}" />
+		数据库的密码
+		<property name="password" value="${jdbc.password}" />
+		检查数据库连接池中空闲连接的间隔时间，单位是分，默认值：240，如果要取消则设置为0
+		<property name="idleConnectionTestPeriod" value="60" />
+		连接池中未使用的链接最大存活时间，单位是分，默认值：60，如果要永远存活设置为0
+		<property name="idleMaxAge" value="30" />
+		每个分区最大的连接数
+		
+		判断依据：请求并发数
+		
+		<property name="maxConnectionsPerPartition" value="100" />
+		每个分区最小的连接数
+		<property name="minConnectionsPerPartition" value="5" />
+	</bean> -->
+	
+	
+
+	<!-- 配置SqlSessionFactoryBean -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 引用数据源组件 -->
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 引用mybatis配置文件中的配置 -->
+		<property name="configLocation" value="classpath:MyBatis-config.xml"></property>
+	</bean> 
+	<!-- 定义事务管理器 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 通过<tx:advice>标签为指定的事务管理器设置事务属性  -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="select*" propagation="SUPPORTS"/>
+			<tx:method name="insert*" propagation="REQUIRED"/>
+			<tx:method name="delete*" propagation="REQUIRED"/>
+			<tx:method name="*" propagation="REQUIRED"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!-- 定义切入点 -->
+		<aop:pointcut expression="execution(* com.hfxt.me.service..*.*(..))" id="serviceMethod"/>
+		<!-- 将事务增强与切入点组合 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod"/>
+	</aop:config>
+	
+	<import resource="applicationContext-commen.xml"/>
+	
+</beans>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<typeAliases>
+		<package name="com.hfxt.me.entity"/>  	<!-- 设置完全限定名 -->
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="com/hfxt/me/dao/FaqsMapper.xml" />
+		<mapper resource="com/hfxt/me/dao/CalsssesMapper.xml" />
+	</mappers>
+</configuration>

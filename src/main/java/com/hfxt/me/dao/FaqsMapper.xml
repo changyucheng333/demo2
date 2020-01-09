@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hfxt.me.dao.FaqsDao">
+	<select id="selectAll" resultType="com.hfxt.me.entity.Faqs"
+		parameterType="String">
+		SELECT *,`cname` FROM `faqs`,`classes` WHERE classes.id = faqs.classid
+		<trim prefix="and" prefixOverrides="and">
+			<if test="_parameter!=null and _parameter!='' ">title LIKE concat('%',#{_parameter},'%')</if>
+		</trim>
+		 ORDER BY createdate DESC
+	</select>
+	<insert id="insert" parameterType="com.hfxt.me.entity.Faqs">
+		INSERT INTO
+		`faqmanagement`.`faqs` (`title`,`createdate`,`content`,`classid`)VALUES
+		(
+		#{title},
+		#{createdate},
+		#{content},
+		#{classid}
+		) ;
+
+	</insert>
+</mapper>
